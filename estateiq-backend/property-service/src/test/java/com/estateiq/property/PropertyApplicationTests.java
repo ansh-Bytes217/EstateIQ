@@ -1,12 +1,17 @@
 package com.estateiq.property;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 @SpringBootTest
 class PropertyApplicationTests {
+
+    @MockBean
+    private JwtDecoder jwtDecoder;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
