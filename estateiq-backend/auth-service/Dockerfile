@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS builder
 WORKDIR /app
 
 # Copy pom.xml files for dependency resolution
@@ -13,7 +13,7 @@ COPY search-service/pom.xml search-service/
 COPY . .
 
 # Build the required modules
-RUN ./mvnw clean package -pl common,auth-service -am -DskipTests || mvn clean package -pl common,auth-service -am -DskipTests
+RUN mvn clean package -pl common,auth-service -am -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
