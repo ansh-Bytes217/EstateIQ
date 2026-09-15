@@ -44,13 +44,21 @@ docker compose up -d
 ```
 
 ### 2. Configure Environment Variables
-By default, the services will look for localhost connections. 
+Copy the `.env.example` file to `.env` in the root of `estateiq-backend` to configure environment overrides. 
+By default, the services fallback to localhost connections:
 - **PostgreSQL**: `jdbc:postgresql://localhost:5432/estateiq_db` (User: `estateiq`, Password: `estateiq_password`)
 - **Keycloak**: Running on `http://localhost:8080` (Admin: `admin` / `admin`)
 
 ### 3. Build & Test
 ```bash
 mvn clean verify
+```
+
+### 4. Build Service Docker Images
+Each microservice contains a multi-stage Dockerfile that correctly resolves the monorepo dependencies. Build them via:
+```bash
+docker build -t estateiq-gateway-service -f gateway-service/Dockerfile .
+docker build -t estateiq-property-service -f property-service/Dockerfile .
 ```
 
 ### 4. Run Services
