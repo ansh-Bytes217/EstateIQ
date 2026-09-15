@@ -1,0 +1,6 @@
+{
+  "name": "EstateIQ",
+  "description": "Enterprise-grade real-estate marketplace and property-management platform",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

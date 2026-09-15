@@ -1,0 +1,141 @@
+import { Property, Agent } from "../types";
+
+export const MOCK_AGENTS: Agent[] = [
+  {
+    id: "a1",
+    name: "Sarah Jenkins",
+    phone: "+91 98765 43210",
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100",
+    rating: 4.9,
+  },
+  {
+    id: "a2",
+    name: "Rajesh Kumar",
+    phone: "+91 99887 76655",
+    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=100&h=100",
+    rating: 4.7,
+  }
+];
+
+export const MOCK_PROPERTIES: Property[] = [
+  {
+    id: "p1",
+    title: "Skyline Luxury Penthouse",
+    type: "Penthouse",
+    status: "For Sale",
+    price: 45000000,
+    location: { city: "Mumbai", locality: "Worli Sea Face", coordinates: [19.0169, 72.8166] },
+    specs: { beds: 4, baths: 5, area: 4500, furnishing: "Furnished" },
+    amenities: ["Private Pool", "Sea View", "Gym", "Smart Home", "24/7 Security"],
+    images: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800",
+    ],
+    agentId: "a1",
+    featured: true,
+  },
+  {
+    id: "p2",
+    title: "Serene Villa by the Lake",
+    type: "Villa",
+    status: "For Sale",
+    price: 28000000,
+    location: { city: "Bangalore", locality: "Whitefield", coordinates: [12.9698, 77.7499] },
+    specs: { beds: 3, baths: 4, area: 3200, furnishing: "Semi-Furnished" },
+    amenities: ["Garden", "Clubhouse", "Tennis Court", "Power Backup"],
+    images: [
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?auto=format&fit=crop&q=80&w=800",
+    ],
+    agentId: "a2",
+    featured: true,
+  },
+  {
+    id: "p3",
+    title: "Modern Minimalist Apartment",
+    type: "Apartment",
+    status: "For Rent",
+    price: 85000,
+    location: { city: "Delhi", locality: "South Extension", coordinates: [28.5684, 77.2210] },
+    specs: { beds: 2, baths: 2, area: 1500, furnishing: "Furnished" },
+    amenities: ["Metro Access", "Balcony", "Modular Kitchen", "Gym"],
+    images: [
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800",
+    ],
+    agentId: "a1",
+  },
+  {
+    id: "p4",
+    title: "Tech Park Commercial Space",
+    type: "Commercial",
+    status: "For Rent",
+    price: 350000,
+    location: { city: "Pune", locality: "Hinjewadi", coordinates: [18.5913, 73.7389] },
+    specs: { beds: 0, baths: 4, area: 8000, furnishing: "Unfurnished" },
+    amenities: ["Cafeteria", "Conference Rooms", "Central AC", "Parking"],
+    images: [
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800",
+    ],
+    agentId: "a2",
+  },
+  {
+    id: "p5",
+    title: "Boutique Garden Apartment",
+    type: "Apartment",
+    status: "For Sale",
+    price: 15000000,
+    location: { city: "Mumbai", locality: "Bandra West", coordinates: [19.0596, 72.8295] },
+    specs: { beds: 2, baths: 2, area: 1200, furnishing: "Furnished" },
+    amenities: ["Terrace Garden", "Pet Friendly", "Security"],
+    images: [
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=800",
+    ],
+    agentId: "a1",
+    featured: true,
+  },
+  {
+    id: "p6",
+    title: "Aura Premium Residences",
+    type: "Apartment",
+    status: "For Sale",
+    price: 22000000,
+    location: { city: "Hyderabad", locality: "Banjara Hills", coordinates: [17.4156, 78.4347] },
+    specs: { beds: 3, baths: 3, area: 2400, furnishing: "Unfurnished" },
+    amenities: ["Infinity Pool", "Clubhouse", "Smart Home", "EV Charging"],
+    images: [
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=800",
+    ],
+    agentId: "a2",
+    isNewConstruction: true,
+  },
+  {
+    id: "p7",
+    title: "Zenith Tech Heights",
+    type: "Apartment",
+    status: "For Sale",
+    price: 31000000,
+    location: { city: "Bangalore", locality: "Electronic City", coordinates: [12.8452, 77.6602] },
+    specs: { beds: 4, baths: 4, area: 3100, furnishing: "Unfurnished" },
+    amenities: ["Co-working Space", "Gym", "Jogging Track"],
+    images: [
+      "https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&q=80&w=800",
+    ],
+    agentId: "a1",
+    isNewConstruction: true,
+    featured: true,
+  },
+  {
+    id: "p8",
+    title: "Heritage Row House",
+    type: "Villa",
+    status: "For Sale",
+    price: 18000000,
+    location: { city: "Ahmedabad", locality: "Satellite", coordinates: [23.0292, 72.5186] },
+    specs: { beds: 3, baths: 3, area: 2800, furnishing: "Semi-Furnished" },
+    amenities: ["Private Garden", "Dedicated Parking"],
+    images: [
+      "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&q=80&w=800",
+    ],
+    agentId: "a2",
+  }
+];

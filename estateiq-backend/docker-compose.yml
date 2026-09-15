@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: estateiq-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: estateiq
+      POSTGRES_PASSWORD: estateiq_password
+      POSTGRES_DB: estateiq_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U estateiq -d estateiq_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: estateiq-keycloak
+    command: start-dev
+    ports:
+      - "8080:8080"
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/estateiq_db
+      KC_DB_USERNAME: estateiq
+      KC_DB_PASSWORD: estateiq_password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: estateiq-prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: estateiq-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres-data:

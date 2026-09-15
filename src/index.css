@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+.custom-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0.75rem;
+}
+
+.custom-popup .leaflet-popup-content {
+  margin: 0;
+  width: 192px !important;
+}
+
+.custom-popup .leaflet-popup-tip-container {
+  display: none;
+}
+
