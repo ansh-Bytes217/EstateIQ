@@ -70,8 +70,33 @@ mvn spring-boot:run
 
 ## Database Migrations
 
-Database schemas are strictly managed using **Flyway**. Manual schema modification via Hibernate (`ddl-auto=update`) is disabled in favor of `validate`. 
-Migration files are located in `property-service/src/main/resources/db/migration`.
+Database schemas are strictly managed using **Flyway**. Manual schema modification via Hibernate (`ddl-auto=update`) is disabled in favor of `validate`.
+
+Auth Service owns the `auth` PostgreSQL schema and its `auth.flyway_schema_history` table. Property Service owns the `property` schema and its `property.flyway_schema_history` table. Both services use the same database, but neither service manages the other service's tables or creates cross-service foreign keys.
+
+Migration files are located in each service's `src/main/resources/db/migration` directory. Applied migrations are immutable; do not edit them or run Flyway repair to conceal checksum changes.
+
+### Local Development Database Reset
+
+The old development database may contain `public.users` and `public.flyway_schema_history` from the pre-isolation configuration. Do not drop or rename these objects automatically, and do not use Flyway repair. After confirming that the database is disposable and backing up anything needed, reset it explicitly:
+
+```sql
+DROP SCHEMA IF EXISTS auth CASCADE;
+DROP SCHEMA IF EXISTS property CASCADE;
+DROP TABLE IF EXISTS public.users CASCADE;
+DROP TABLE IF EXISTS public.flyway_schema_history CASCADE;
+```
+
+Then restart the services. Flyway creates `auth` and `property` and their independent history tables before applying the unchanged migrations. To inspect the result:
+
+```sql
+SELECT schemaname, tablename
+FROM pg_tables
+WHERE schemaname IN ('auth', 'property')
+ORDER BY schemaname, tablename;
+```
+
+Expected application tables are `auth.users`, `property.properties`, and `property.listings`, plus one Flyway history table in each schema.
 
 ## Security
 

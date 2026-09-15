@@ -19,10 +19,19 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        default_schema: property
     open-in-view: false
   flyway:
     enabled: true
-    baseline-on-migrate: true
+    schemas: property
+    default-schema: property
+    table: flyway_schema_history
+    create-schemas: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/estateiq}
 
 management:
   endpoints:

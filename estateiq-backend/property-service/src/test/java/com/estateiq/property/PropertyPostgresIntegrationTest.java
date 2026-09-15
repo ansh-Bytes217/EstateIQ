@@ -10,6 +10,7 @@ import com.estateiq.property.repository.ListingRepository;
 import com.estateiq.property.repository.PropertyRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -45,10 +46,22 @@ class PropertyPostgresIntegrationTest {
 
     @Autowired private PropertyRepository propertyRepository;
     @Autowired private ListingRepository listingRepository;
+        @Autowired private JdbcTemplate jdbcTemplate;
     @MockBean private JwtDecoder jwtDecoder;
 
     @Test
     void flywaySchemaSupportsPropertyListingAggregate() {
+        assertThat(jdbcTemplate.queryForObject("SELECT to_regclass('property.flyway_schema_history')", String.class))
+                .isEqualTo("property.flyway_schema_history");
+        assertThat(jdbcTemplate.queryForObject("SELECT to_regclass('property.properties')", String.class))
+                .isEqualTo("property.properties");
+        assertThat(jdbcTemplate.queryForObject("SELECT to_regclass('property.listings')", String.class))
+                .isEqualTo("property.listings");
+        assertThat(jdbcTemplate.queryForObject("SELECT to_regclass('auth.users')", String.class))
+                .isNull();
+        assertThat(jdbcTemplate.queryForObject("SELECT to_regclass('auth.flyway_schema_history')", String.class))
+                .isNull();
+
         Property property = propertyRepository.save(Property.builder()
                 .id(UUID.randomUUID())
                 .ownerSubject("postgres-owner")

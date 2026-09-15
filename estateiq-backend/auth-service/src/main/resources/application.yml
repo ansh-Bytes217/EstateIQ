@@ -19,10 +19,14 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        default_schema: auth
     open-in-view: false
   flyway:
     enabled: true
-    baseline-on-migrate: true
+    schemas: auth
+    default-schema: auth
+    table: flyway_schema_history
+    create-schemas: true
   security:
     oauth2:
       resourceserver:
