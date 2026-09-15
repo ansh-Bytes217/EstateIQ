@@ -5,6 +5,7 @@ import com.estateiq.common.exception.ResourceNotFoundException;
 import com.estateiq.common.security.CurrentUserProvider;
 import com.estateiq.property.dto.PropertyRequest;
 import com.estateiq.property.dto.PropertyResponse;
+import com.estateiq.property.dto.PropertyUpdateRequest;
 import com.estateiq.property.entity.Property;
 import com.estateiq.property.entity.PropertyStatus;
 import com.estateiq.property.repository.PropertyRepository;
@@ -49,9 +50,22 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public PropertyResponse update(UUID id, PropertyRequest request) {
+    public PropertyResponse update(UUID id, PropertyUpdateRequest request) {
         Property property = findOwned(id);
-        apply(property, request);
+        if (request.getTitle() != null) property.setTitle(request.getTitle());
+        if (request.getDescription() != null) property.setDescription(request.getDescription());
+        if (request.getPropertyType() != null) property.setPropertyType(request.getPropertyType());
+        if (request.getBedrooms() != null) property.setBedrooms(request.getBedrooms());
+        if (request.getBathrooms() != null) property.setBathrooms(request.getBathrooms());
+        if (request.getAreaSqft() != null) property.setAreaSqft(request.getAreaSqft());
+        if (request.getCity() != null) property.setCity(request.getCity());
+        if (request.getLocality() != null) property.setLocality(request.getLocality());
+        if (request.getYearBuilt() != null) property.setYearBuilt(request.getYearBuilt());
+        if (request.getFloor() != null) property.setFloor(request.getFloor());
+        if (request.getParking() != null) property.setParking(request.getParking());
+        if (request.getFurnished() != null) property.setFurnished(request.getFurnished());
+        if (request.getLatitude() != null) property.setLatitude(request.getLatitude());
+        if (request.getLongitude() != null) property.setLongitude(request.getLongitude());
         return toResponse(propertyRepository.save(property));
     }
 
@@ -73,9 +87,6 @@ public class PropertyServiceImpl implements PropertyService {
         property.setTitle(request.getTitle());
         property.setDescription(request.getDescription());
         property.setPropertyType(request.getPropertyType());
-        property.setListingType(request.getListingType());
-        property.setPrice(request.getPrice());
-        property.setCurrency(request.getCurrency());
         property.setBedrooms(request.getBedrooms());
         property.setBathrooms(request.getBathrooms());
         property.setAreaSqft(request.getAreaSqft());
@@ -93,8 +104,7 @@ public class PropertyServiceImpl implements PropertyService {
         return PropertyResponse.builder()
                 .id(property.getId()).ownerSubject(property.getOwnerSubject()).title(property.getTitle())
                 .description(property.getDescription()).propertyType(property.getPropertyType())
-                .listingType(property.getListingType()).status(property.getStatus()).price(property.getPrice())
-                .currency(property.getCurrency()).bedrooms(property.getBedrooms()).bathrooms(property.getBathrooms())
+                .status(property.getStatus()).bedrooms(property.getBedrooms()).bathrooms(property.getBathrooms())
                 .areaSqft(property.getAreaSqft()).city(property.getCity()).locality(property.getLocality())
                 .yearBuilt(property.getYearBuilt()).floor(property.getFloor()).parking(property.isParking())
                 .furnished(property.isFurnished()).latitude(property.getLatitude()).longitude(property.getLongitude())

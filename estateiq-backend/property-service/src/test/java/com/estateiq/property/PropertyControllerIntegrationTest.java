@@ -2,6 +2,7 @@ package com.estateiq.property;
 
 import com.estateiq.property.dto.ListingRequest;
 import com.estateiq.property.dto.PropertyRequest;
+import com.estateiq.property.dto.PropertyUpdateRequest;
 import com.estateiq.property.entity.Listing;
 import com.estateiq.property.entity.ListingStatus;
 import com.estateiq.property.entity.ListingType;
@@ -85,7 +86,7 @@ class PropertyControllerIntegrationTest {
     void anotherOwnerCannotReadProperty() throws Exception {
         var property = propertyRepository.save(com.estateiq.property.entity.Property.builder()
                 .id(UUID.randomUUID()).ownerSubject("owner-a").title("Private home")
-                .propertyType(PropertyType.VILLA).listingType(ListingType.SALE)
+                .propertyType(PropertyType.VILLA)
                 .status(com.estateiq.property.entity.PropertyStatus.DRAFT).build());
 
         mockMvc.perform(get("/api/v1/properties/" + property.getId())
@@ -98,7 +99,7 @@ class PropertyControllerIntegrationTest {
         String subject = "listing-owner";
         var property = propertyRepository.save(com.estateiq.property.entity.Property.builder()
                 .id(UUID.randomUUID()).ownerSubject(subject).title("Listing home")
-                .propertyType(PropertyType.APARTMENT).listingType(ListingType.SALE)
+                .propertyType(PropertyType.APARTMENT)
                 .status(com.estateiq.property.entity.PropertyStatus.DRAFT).build());
         ListingRequest request = new ListingRequest();
         request.setListingType(ListingType.SALE);
@@ -124,7 +125,7 @@ class PropertyControllerIntegrationTest {
         String subject = "transition-owner";
         var property = propertyRepository.save(com.estateiq.property.entity.Property.builder()
                 .id(UUID.randomUUID()).ownerSubject(subject).title("Transition home")
-                .propertyType(PropertyType.APARTMENT).listingType(ListingType.RENT)
+                .propertyType(PropertyType.APARTMENT)
                 .status(com.estateiq.property.entity.PropertyStatus.DRAFT).build());
         Listing listing = listingRepository.save(Listing.builder().id(UUID.randomUUID()).property(property)
                 .listingType(ListingType.RENT).status(ListingStatus.SOLD).price(new BigDecimal("1000"))
@@ -137,13 +138,30 @@ class PropertyControllerIntegrationTest {
                 .andExpect(jsonPath("$.error").value("INVALID_STATE_TRANSITION"));
     }
 
+    @Test
+    void ownerCanPartiallyUpdateProperty() throws Exception {
+        String subject = "patch-owner";
+        var property = propertyRepository.save(com.estateiq.property.entity.Property.builder()
+                .id(UUID.randomUUID()).ownerSubject(subject).title("Original title")
+                .description("Keep this description").propertyType(PropertyType.APARTMENT)
+                .status(com.estateiq.property.entity.PropertyStatus.DRAFT).build());
+
+        PropertyUpdateRequest request = new PropertyUpdateRequest();
+        request.setDescription("Updated description");
+
+        mockMvc.perform(patch("/api/v1/properties/" + property.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(jwt().jwt(jwt -> jwt.subject(subject))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Original title"))
+                .andExpect(jsonPath("$.description").value("Updated description"));
+    }
+
     private PropertyRequest propertyRequest() {
         PropertyRequest request = new PropertyRequest();
         request.setTitle("City apartment");
         request.setPropertyType(PropertyType.APARTMENT);
-        request.setListingType(ListingType.SALE);
-        request.setPrice(new BigDecimal("200000"));
-        request.setCurrency("USD");
         return request;
     }
 }

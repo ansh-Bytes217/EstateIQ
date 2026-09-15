@@ -7,6 +7,7 @@ import com.estateiq.property.dto.ListingResponse;
 import com.estateiq.property.dto.ListingStatusRequest;
 import com.estateiq.property.dto.PropertyRequest;
 import com.estateiq.property.dto.PropertyResponse;
+import com.estateiq.property.dto.PropertyUpdateRequest;
 import com.estateiq.property.service.ListingService;
 import com.estateiq.property.service.PropertyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,13 +54,13 @@ public class PropertyController {
     @GetMapping("/{id}")
     public PropertyResponse get(@PathVariable UUID id) { return propertyService.get(id); }
 
-    @Operation(summary = "List owned properties")
+    @Operation(summary = "List owned properties", description = "Authenticated owner-management listing. Public property discovery is reserved for the Search service.")
     @GetMapping
     public PagedResponse<PropertyResponse> list(Pageable pageable) { return propertyService.list(pageable); }
 
     @Operation(summary = "Update a property")
-    @PutMapping("/{id}")
-    public PropertyResponse update(@PathVariable UUID id, @Valid @RequestBody PropertyRequest request) {
+    @PatchMapping("/{id}")
+    public PropertyResponse update(@PathVariable UUID id, @Valid @RequestBody PropertyUpdateRequest request) {
         return propertyService.update(id, request);
     }
 

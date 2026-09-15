@@ -10,8 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -39,18 +37,8 @@ public class Property {
     private PropertyType propertyType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "listing_type", length = 50)
-    private ListingType listingType;
-
-    @Enumerated(EnumType.STRING)
     @Column(length = 50)
     private PropertyStatus status;
-
-    @Column(precision = 19, scale = 2)
-    private BigDecimal price;
-
-    @Column(length = 10)
-    private String currency;
 
     private Integer bedrooms;
     
@@ -77,10 +65,6 @@ public class Property {
     private BigDecimal latitude;
 
     private BigDecimal longitude;
-
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Listing> listings = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

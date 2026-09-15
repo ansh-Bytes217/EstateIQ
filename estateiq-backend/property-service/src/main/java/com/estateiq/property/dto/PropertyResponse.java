@@ -1,6 +1,5 @@
 package com.estateiq.property.dto;
 
-import com.estateiq.property.entity.ListingType;
 import com.estateiq.property.entity.PropertyStatus;
 import com.estateiq.property.entity.PropertyType;
 import lombok.Builder;
@@ -18,10 +17,7 @@ public class PropertyResponse {
     String title;
     String description;
     PropertyType propertyType;
-    ListingType listingType;
     PropertyStatus status;
-    BigDecimal price;
-    String currency;
     Integer bedrooms;
     Integer bathrooms;
     BigDecimal areaSqft;
