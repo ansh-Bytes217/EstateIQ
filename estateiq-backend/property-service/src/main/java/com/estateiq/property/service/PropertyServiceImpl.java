@@ -1,0 +1,103 @@
+package com.estateiq.property.service;
+
+import com.estateiq.common.dto.PagedResponse;
+import com.estateiq.common.exception.ResourceNotFoundException;
+import com.estateiq.common.security.CurrentUserProvider;
+import com.estateiq.property.dto.PropertyRequest;
+import com.estateiq.property.dto.PropertyResponse;
+import com.estateiq.property.entity.Property;
+import com.estateiq.property.entity.PropertyStatus;
+import com.estateiq.property.repository.PropertyRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class PropertyServiceImpl implements PropertyService {
+    private final PropertyRepository propertyRepository;
+    private final CurrentUserProvider currentUserProvider;
+
+    @Override
+    public PropertyResponse create(PropertyRequest request) {
+        Property property = new Property();
+        property.setId(UUID.randomUUID());
+        property.setOwnerSubject(currentUserProvider.getRequiredUserSubject());
+        property.setStatus(PropertyStatus.DRAFT);
+        apply(property, request);
+        return toResponse(propertyRepository.save(property));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PropertyResponse get(UUID id) {
+        return toResponse(findOwned(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponse<PropertyResponse> list(Pageable pageable) {
+        String subject = currentUserProvider.getRequiredUserSubject();
+        var page = currentUserProvider.isAdmin()
+                ? propertyRepository.findAll(pageable)
+                : propertyRepository.findAllByOwnerSubject(subject, pageable);
+        return PagedResponse.from(page.map(this::toResponse));
+    }
+
+    @Override
+    public PropertyResponse update(UUID id, PropertyRequest request) {
+        Property property = findOwned(id);
+        apply(property, request);
+        return toResponse(propertyRepository.save(property));
+    }
+
+    @Override
+    public void delete(UUID id) {
+        propertyRepository.delete(findOwned(id));
+    }
+
+    private Property findOwned(UUID id) {
+        if (currentUserProvider.isAdmin()) {
+            return propertyRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Property not found: " + id));
+        }
+        return propertyRepository.findByIdAndOwnerSubject(id, currentUserProvider.getRequiredUserSubject())
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found: " + id));
+    }
+
+    private void apply(Property property, PropertyRequest request) {
+        property.setTitle(request.getTitle());
+        property.setDescription(request.getDescription());
+        property.setPropertyType(request.getPropertyType());
+        property.setListingType(request.getListingType());
+        property.setPrice(request.getPrice());
+        property.setCurrency(request.getCurrency());
+        property.setBedrooms(request.getBedrooms());
+        property.setBathrooms(request.getBathrooms());
+        property.setAreaSqft(request.getAreaSqft());
+        property.setCity(request.getCity());
+        property.setLocality(request.getLocality());
+        property.setYearBuilt(request.getYearBuilt());
+        property.setFloor(request.getFloor());
+        property.setParking(request.isParking());
+        property.setFurnished(request.isFurnished());
+        property.setLatitude(request.getLatitude());
+        property.setLongitude(request.getLongitude());
+    }
+
+    private PropertyResponse toResponse(Property property) {
+        return PropertyResponse.builder()
+                .id(property.getId()).ownerSubject(property.getOwnerSubject()).title(property.getTitle())
+                .description(property.getDescription()).propertyType(property.getPropertyType())
+                .listingType(property.getListingType()).status(property.getStatus()).price(property.getPrice())
+                .currency(property.getCurrency()).bedrooms(property.getBedrooms()).bathrooms(property.getBathrooms())
+                .areaSqft(property.getAreaSqft()).city(property.getCity()).locality(property.getLocality())
+                .yearBuilt(property.getYearBuilt()).floor(property.getFloor()).parking(property.isParking())
+                .furnished(property.isFurnished()).latitude(property.getLatitude()).longitude(property.getLongitude())
+                .createdAt(property.getCreatedAt()).updatedAt(property.getUpdatedAt()).build();
+    }
+}

@@ -1,9 +1,6 @@
 package com.estateiq.property.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +10,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -26,20 +25,26 @@ public class Property {
     @Id
     private UUID id;
 
+    @Column(name = "owner_subject", nullable = false, length = 255)
+    private String ownerSubject;
+
     @Column(nullable = false)
     private String title;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "property_type", length = 50)
-    private String propertyType;
+    private PropertyType propertyType;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "listing_type", length = 50)
-    private String listingType;
+    private ListingType listingType;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 50)
-    private String status;
+    private PropertyStatus status;
 
     @Column(precision = 19, scale = 2)
     private BigDecimal price;
@@ -59,6 +64,23 @@ public class Property {
 
     @Column(length = 100)
     private String locality;
+
+    @Column(name = "year_built")
+    private Integer yearBuilt;
+
+    private Integer floor;
+
+    private boolean parking;
+
+    private boolean furnished;
+
+    private BigDecimal latitude;
+
+    private BigDecimal longitude;
+
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Listing> listings = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
