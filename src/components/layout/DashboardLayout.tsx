@@ -39,7 +39,7 @@ export const DashboardLayout = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 text-white flex flex-col hidden md:flex">
         <div className="h-16 flex items-center px-6 border-b border-slate-800">
-          <Link to="/" className="flex items-center gap-2 text-emerald-400">
+          <Link to="/app" className="flex items-center gap-2 text-emerald-400">
             <Building2 className="h-6 w-6" />
             <span className="text-xl font-bold tracking-tight text-white">EstateIQ</span>
           </Link>

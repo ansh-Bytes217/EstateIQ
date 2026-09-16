@@ -12,6 +12,7 @@ import { Search } from "./pages/Search";
 import { PropertyDetails } from "./pages/PropertyDetails";
 import { AgentDashboard } from "./components/dashboard/AgentDashboard";
 import { AuthProvider } from "./auth/AuthContext";
+import { Landing } from "./pages/Landing";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,8 +28,9 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
+          <Route path="/" element={<Landing />} />
           <Route element={<AppLayout />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/app" element={<Home />} />
             <Route path="/search" element={<Search />} />
             <Route path="/properties/:id" element={<PropertyDetails />} />
             <Route path="/saved" element={<div className="container mx-auto p-8"><h1 className="text-2xl font-bold">Saved Properties</h1><p className="mt-4 text-slate-500">Feature coming soon...</p></div>} />

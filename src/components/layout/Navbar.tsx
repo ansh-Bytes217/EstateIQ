@@ -32,7 +32,7 @@ export const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2 text-emerald-600">
+          <Link to="/app" className="flex items-center gap-2 text-emerald-600">
             <Building2 className="h-6 w-6" />
             <span className="text-xl font-bold tracking-tight text-slate-900">EstateIQ</span>
           </Link>
