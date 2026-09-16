@@ -41,6 +41,7 @@ Gateway Service :8080
 | `gateway-service` | `8080` | Public API boundary, routing, CORS, and service composition |
 | `auth-service` | `8081` | Current-user profile operations and authentication-domain persistence |
 | `property-service` | `8082` | Property and listing management backed by PostgreSQL |
+| `data-generator` | - | Standalone synthetic property and listing data CLI |
 | `search-service` | `8083` | Search-service foundation for future advanced search capabilities |
 | `common` | - | Shared security configuration, DTOs, exceptions, and utilities |
 
@@ -239,6 +240,7 @@ estateiq-backend/
 ├── gateway-service/         # Public Spring Cloud Gateway
 ├── auth-service/            # User and authentication domain
 ├── property-service/       # Properties and listings domain
+├── data-generator/         # Standalone synthetic data CLI
 ├── search-service/          # Search-service foundation
 ├── docker-compose.yml       # Local infrastructure
 ├── .env.example             # Environment variable reference

@@ -24,6 +24,7 @@
         <module>auth-service</module>
         <module>property-service</module>
         <module>search-service</module>
+        <module>data-generator</module>
     </modules>
 
     <properties>
