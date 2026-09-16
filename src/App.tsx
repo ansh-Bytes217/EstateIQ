@@ -11,6 +11,7 @@ import { Home } from "./pages/Home";
 import { Search } from "./pages/Search";
 import { PropertyDetails } from "./pages/PropertyDetails";
 import { AgentDashboard } from "./components/dashboard/AgentDashboard";
+import { AuthProvider } from "./auth/AuthContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,8 +24,9 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
           <Route element={<AppLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
@@ -38,8 +40,9 @@ export default function App() {
             <Route path="tenant" element={<div className="p-6"><h1 className="text-2xl font-bold">Tenant Dashboard</h1></div>} />
             <Route path="*" element={<div className="p-6">Feature in development...</div>} />
           </Route>
-        </Routes>
-      </BrowserRouter>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
