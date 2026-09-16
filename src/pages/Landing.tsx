@@ -1,7 +1,10 @@
 import { ArrowRight, Building2, Home, KeyRound, LineChart, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useStore } from "../store/useStore";
 import type { Role } from "../types";
+import { useAuth } from "../auth/AuthContext";
+import { AuthModal } from "../auth/AuthModal";
 
 const roleOptions: Array<{
   role: Role;
@@ -43,10 +46,24 @@ const roleOptions: Array<{
 export function Landing() {
   const navigate = useNavigate();
   const setRole = useStore((state) => state.setRole);
+  const { user } = useAuth();
+  const [pendingRole, setPendingRole] = useState<{ role: Role; destination: string } | null>(null);
+
+  useEffect(() => {
+    if (user && pendingRole) {
+      navigate(pendingRole.destination);
+      setPendingRole(null);
+    }
+  }, [navigate, pendingRole, user]);
 
   const enterWorkspace = (role: Role, destination: string) => {
     setRole(role);
     navigate(destination);
+  };
+
+  const finishAuthentication = () => {
+    if (!pendingRole) return;
+    setRole(pendingRole.role);
   };
 
   return (
@@ -114,6 +131,7 @@ export function Landing() {
           </div>
         </div>
       </section>
+      {pendingRole && <AuthModal onClose={() => setPendingRole(null)} onSuccess={finishAuthentication} />}
     </main>
   );
 }

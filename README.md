@@ -4,13 +4,14 @@ EstateIQ is a full-stack real-estate marketplace and property-management platfor
 
 ## Project Overview
 
-- Browse and search real-estate properties through a responsive web application
-- Manage property and listing data through REST APIs
-- Route browser traffic through a centralized Spring Cloud Gateway
-- Secure backend endpoints with Keycloak-issued OAuth2/JWT tokens
-- Persist data in PostgreSQL with Flyway-managed migrations
-- Run integration tests against real PostgreSQL instances with Testcontainers
-- Deploy the frontend on Vercel and backend services on Railway
+- **Autonomous AI Copilot**: Context-aware agentic workflows for **Buyers**, **Tenants**, **Agents**, and **Landlords/Sellers** with tool execution (property search, mortgage EMI calculator, emergency maintenance triage, listing copy generation, and tour booking).
+- **Multi-Persona Enterprise Portals**: Dedicated operational dashboards for Landlords (rent ledger, AI maintenance triage board) and Tenants (active lease, 1-click rent simulation, AI diagnostic tickets).
+- **Side-by-Side Comparison Matrix**: In-depth property analytics and AI investment compatibility scoring.
+- **Microservice Architecture**: Java 21 and Spring Boot 3.2 backend with Spring Cloud Gateway routing, OAuth2/Keycloak security, and PostgreSQL 16 with Flyway migrations (V1–V4).
+- **Testcontainers & Docker**: Integration testing against real PostgreSQL instances with Testcontainers, Prometheus/Grafana observability, and containerized deployment.
+
+> 🌟 **Looking for recruiter-ready resume bullets, architecture diagrams, and demo walkthrough scripts?**
+> See [PORTFOLIO_SHOWCASE.md](PORTFOLIO_SHOWCASE.md) for full technical documentation.
 
 ## Architecture
 
