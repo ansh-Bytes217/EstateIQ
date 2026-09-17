@@ -22,6 +22,67 @@ export interface Property {
   agentId: string;
   featured?: boolean;
   isNewConstruction?: boolean;
+  zestimate?: Zestimate;
+  priceHistory?: PriceHistoryEvent[];
+  taxHistory?: TaxHistoryRecord[];
+  schools?: SchoolInfo[];
+  scores?: LocationScores;
+  climateRisks?: ClimateRiskInfo;
+  monthlyCosts?: MonthlyCostDefaults;
+  floorPlanImage?: string;
+}
+
+export interface Zestimate {
+  estimatedValue: number;
+  rangeLow: number;
+  rangeHigh: number;
+  oneYearForecastPercent: number;
+  thirtyDayChange: number;
+  estimatedRent?: number;
+  confidenceScore: number;
+}
+
+export interface PriceHistoryEvent {
+  date: string;
+  event: "Listed" | "Price Change" | "Sold" | "Pending";
+  price: number;
+  priceChangePercent?: number;
+  source: string;
+}
+
+export interface TaxHistoryRecord {
+  year: number;
+  propertyTax: number;
+  taxAssessment: number;
+}
+
+export interface SchoolInfo {
+  name: string;
+  rating: number; // 1-10
+  type: "Public" | "Private";
+  grades: string;
+  distance: string;
+}
+
+export interface LocationScores {
+  walkScore: number;
+  walkDescription: string;
+  transitScore: number;
+  transitDescription: string;
+  bikeScore: number;
+  bikeDescription: string;
+}
+
+export interface ClimateRiskInfo {
+  floodRisk: "Minimal" | "Moderate" | "Major" | "Severe";
+  fireRisk: "Minimal" | "Moderate" | "Major" | "Severe";
+  heatRisk: "Minimal" | "Moderate" | "Major" | "Severe";
+}
+
+export interface MonthlyCostDefaults {
+  hoaFee: number;
+  propertyTaxRatePercent: number;
+  homeownersInsuranceRatePercent: number;
 }
 
 export interface Agent {

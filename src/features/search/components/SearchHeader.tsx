@@ -9,7 +9,7 @@ export const SearchHeader = () => {
   const [query, setQuery] = useState(filters.city || "");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     setQuery(filters.city || "");
