@@ -1,114 +1,304 @@
 # EstateIQ
 
-EstateIQ is a full-stack real-estate marketplace and property-management platform. The project combines a modern React/Vite frontend with a modular Java 21 and Spring Boot backend designed around independently deployable services.
+**EstateIQ is a full-stack real-estate marketplace and property management platform built to demonstrate production-oriented software engineering across frontend, backend, security, databases, and distributed systems.**
 
-## Project Overview
+The platform provides property and listing management, authenticated user workflows, centralized API routing, and a foundation for scalable property search and intelligence features.
 
-- **Autonomous AI Copilot**: Context-aware agentic workflows for **Buyers**, **Tenants**, **Agents**, and **Landlords/Sellers** with tool execution (property search, mortgage EMI calculator, emergency maintenance triage, listing copy generation, and tour booking).
-- **Multi-Persona Enterprise Portals**: Dedicated operational dashboards for Landlords (rent ledger, AI maintenance triage board) and Tenants (active lease, 1-click rent simulation, AI diagnostic tickets).
-- **Side-by-Side Comparison Matrix**: In-depth property analytics and AI investment compatibility scoring.
-- **Microservice Architecture**: Java 21 and Spring Boot 3.2 backend with Spring Cloud Gateway routing, OAuth2/Keycloak security, and PostgreSQL 16 with Flyway migrations (V1–V4).
-- **Testcontainers & Docker**: Integration testing against real PostgreSQL instances with Testcontainers, Prometheus/Grafana observability, and containerized deployment.
+The project is designed as a portfolio-scale system rather than a production commercial application, with emphasis on **clean architecture, service boundaries, security, persistence, testing, and deployability**.
 
-> 🌟 **Looking for recruiter-ready resume bullets, architecture diagrams, and demo walkthrough scripts?**
-> See [PORTFOLIO_SHOWCASE.md](PORTFOLIO_SHOWCASE.md) for full technical documentation.
+---
 
 ## Architecture
 
 ```text
-React + Vite frontend (Vercel)
-              |
-              v
-     Spring Cloud Gateway
-        /       |       \
-       v        v        v
-   Auth API  Property API  Search API
-       \        |        /
-        +---- PostgreSQL
-              |
-           Keycloak
+                         ┌──────────────────────┐
+                         │   React + TypeScript  │
+                         │      Frontend        │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │ Spring Cloud Gateway │
+                         │      Port :8080      │
+                         └──────────┬───────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+             ┌────────────┐ ┌─────────────┐ ┌─────────────┐
+             │Auth Service│ │Property     │ │Search       │
+             │   :8081    │ │Service :8082│ │Service :8083│
+             └─────┬──────┘ └──────┬──────┘ └─────────────┘
+                   │                │
+                   ▼                ▼
+             ┌────────────┐   ┌──────────────┐
+             │  Keycloak  │   │ PostgreSQL   │
+             │ OAuth2/OIDC│   │ + Flyway     │
+             └────────────┘   └──────────────┘
 ```
+
+Each backend service owns its domain and persistence concerns. Database schemas are isolated between services, and services do not rely on cross-service database foreign keys.
+
+---
+
+## Core Features
+
+### Property & Listing Management
+
+* Create, retrieve, update, and delete properties
+* Property ownership enforcement
+* Property metadata including:
+
+  * property type
+  * bedrooms/bathrooms
+  * area
+  * location
+  * furnishing
+  * parking
+  * year built
+* Listing lifecycle management
+* Listing state transitions with domain validation
+* Admin-level access controls
+
+### Authentication & Authorization
+
+* OAuth2/OIDC-based authentication through Keycloak
+* JWT-based API authentication
+* Role-based authorization
+* Current-user context derived from authenticated JWT claims
+* Ownership-based authorization for user-owned resources
+
+### Backend Architecture
+
+The backend is organized as a Maven multi-module project:
+
+```text
+estateiq-backend/
+├── common/
+├── gateway-service/
+├── auth-service/
+├── property-service/
+├── search-service/
+└── data-generator/
+```
+
+The services are independently structured Spring Boot applications behind a centralized API Gateway.
+
+### Persistence
+
+* PostgreSQL 16
+* Spring Data JPA / Hibernate
+* Flyway database migrations
+* Schema-per-service persistence boundaries
+* Immutable versioned migrations
+* DTO-based API contracts
+
+### Testing
+
+* JUnit 5
+* Spring Boot Test
+* MockMvc
+* Spring Security Test
+* Testcontainers
+* PostgreSQL integration testing
+
+### Observability & Infrastructure
+
+* Spring Boot Actuator
+* Micrometer
+* Prometheus metrics
+* Docker / Docker Compose
+* Containerized service builds
+
+---
 
 ## Technology Stack
 
 ### Frontend
 
-- React 19
-- TypeScript
-- Vite
-- React Router
-- TanStack Query
-- Tailwind CSS
-- Leaflet and React Leaflet
-- Zustand
+* React
+* TypeScript
+* Vite
+* React Router
+* TanStack Query
+* Tailwind CSS
+* Zustand
+* Leaflet / React Leaflet
 
 ### Backend
 
-- Java 21
-- Spring Boot 3.2
-- Spring Cloud Gateway
-- Spring Security OAuth2 Resource Server
-- Keycloak
-- Spring Data JPA and Hibernate
-- PostgreSQL 16
-- Flyway
-- JUnit, MockMvc, and Testcontainers
-- Docker, Actuator, Micrometer, and Prometheus
+* Java 21
+* Spring Boot 3
+* Spring MVC
+* Spring Security
+* Spring Cloud Gateway
+* Spring Data JPA
+* Hibernate
+* PostgreSQL
+* Flyway
+* Keycloak
+* Maven
 
-## Repository Structure
+### Testing & Infrastructure
+
+* JUnit 5
+* MockMvc
+* Testcontainers
+* Docker
+* Docker Compose
+* Actuator
+* Micrometer
+* Prometheus
+
+---
+
+## Engineering Decisions
+
+### Why a Gateway?
+
+The API Gateway provides a single entry point for the frontend and centralizes routing and cross-cutting concerns instead of exposing every backend service directly.
+
+### Why separate services?
+
+Authentication, property management, and search have different responsibilities and scaling characteristics. Separating them establishes explicit domain boundaries while keeping the system small enough to understand and operate.
+
+### Why schema isolation?
+
+Each service owns its persistence model. This prevents services from becoming tightly coupled through direct database relationships.
 
 ```text
-EstateIQ/
-├── src/                         # React frontend
-├── public/                      # Frontend public assets
-├── estateiq-backend/
-│   ├── gateway-service/         # Public API gateway
-│   ├── auth-service/            # User and authentication domain
-│   ├── property-service/        # Properties and listings domain
-│   ├── search-service/          # Search-service foundation
-│   ├── common/                  # Shared backend contracts and security
-│   └── docker-compose.yml       # Local infrastructure
-├── vercel.json                  # SPA routing for Vercel
-└── package.json
+auth.users
+property.properties
+property.listings
 ```
 
-## Running Locally
+Services communicate through APIs rather than depending on another service's database tables.
 
-### Frontend
+### Why Flyway?
+
+Database schema changes are version-controlled and applied through immutable migrations rather than relying on Hibernate to silently modify production schemas.
+
+### Why Keycloak?
+
+Identity management is delegated to a dedicated OAuth2/OIDC identity provider while the services remain responsible for authorization and domain-level access control.
+
+---
+
+## Synthetic Data Generation
+
+EstateIQ includes a dedicated data-generator module for producing deterministic, realistic property and listing data at scale.
+
+The generator uses batched writes rather than inserting records individually, allowing the system to be tested with progressively larger datasets.
+
+Example target scales:
+
+```text
+10,000
+   ↓
+100,000
+   ↓
+1,000,000+ properties
+```
+
+This provides a foundation for evaluating search, pagination, filtering, indexing, and future analytics workloads without depending on proprietary real-estate datasets.
+
+---
+
+## Local Development
+
+### Prerequisites
+
+* Java 21
+* Maven
+* Node.js
+* Docker / Docker Compose
+
+### Start infrastructure
+
+```bash
+cd estateiq-backend
+docker compose up -d
+```
+
+### Build backend
+
+```bash
+mvn clean verify
+```
+
+### Run frontend
 
 ```bash
 npm install
 npm run dev
 ```
 
-The frontend runs at `http://localhost:3000`.
+The frontend runs on:
 
-### Backend infrastructure
-
-```bash
-cd estateiq-backend
-docker compose up -d
-mvn clean verify
+```text
+http://localhost:3000
 ```
 
-The local infrastructure includes PostgreSQL, Keycloak, Prometheus, and Grafana. See the [backend README](estateiq-backend/README.md) for environment variables, API endpoints, Docker builds, database design, and service deployment instructions.
+Backend services run on their configured ports, with the API Gateway acting as the public entry point.
 
-## Deployment
+---
 
-- **Frontend:** Deploy the repository root to Vercel with `npm run build` and `dist` as the output directory.
-- **Backend:** Deploy the gateway, auth, property, and search services as separate Railway services.
-- **Database:** Use Railway PostgreSQL for production persistence.
-- **Identity:** Configure Keycloak and set the production `KEYCLOAK_ISSUER_URI`.
+## Project Status
 
-Only the gateway should be publicly exposed. Internal services should communicate through Railway private networking where available.
+### Implemented
 
-## Engineering Focus
+* React/TypeScript frontend
+* Spring Cloud Gateway
+* Auth service
+* Property service
+* Search service foundation
+* Keycloak/OAuth2/JWT security
+* PostgreSQL persistence
+* Flyway migrations
+* Ownership and role-based authorization
+* Listing lifecycle management
+* Integration testing with Testcontainers
+* Docker-based infrastructure
+* Synthetic data generation
+* Basic observability
 
-This project demonstrates practical backend and cloud engineering patterns: clear service ownership, centralized API routing, externalized configuration, schema-isolated persistence, immutable database migrations, containerized builds, security boundaries, and integration testing.
+### Planned / Extension Areas
 
-## Detailed Documentation
+The architecture is intentionally designed to support additional capabilities such as:
 
-See [estateiq-backend/README.md](estateiq-backend/README.md) for the complete backend architecture and deployment documentation.
+* Advanced property search
+* Elasticsearch-based search indexing
+* Saved searches and alerts
+* Property comparison
+* Viewing and inquiry workflows
+* Kafka-based domain events
+* Redis caching
+* Recommendation and valuation models
+* AI-assisted property workflows
+
+These are extension areas rather than claims about the current implementation.
+
+---
+
+## What This Project Demonstrates
+
+EstateIQ focuses on practical engineering concepts commonly encountered in backend and full-stack systems:
+
+* Domain-driven service boundaries
+* REST API design
+* Authentication and authorization
+* JWT/OAuth2 security
+* Relational data modeling
+* Database migrations
+* Transactional persistence
+* API Gateway routing
+* Integration testing
+* Containerization
+* Observability
+* Scalable synthetic data generation
+
+The goal is not to build a commercial real-estate startup, but to demonstrate the ability to **design, implement, test, explain, and deploy a non-trivial full-stack system.**
+
+---
 
 ## License
 
