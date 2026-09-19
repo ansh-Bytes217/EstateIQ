@@ -15,7 +15,9 @@ import { LandlordDashboard } from "./components/dashboard/LandlordDashboard";
 import { TenantDashboard } from "./components/dashboard/TenantDashboard";
 import { SavedProperties } from "./pages/SavedProperties";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
-import { Landing } from "./pages/Landing";
+import { BuyPage } from "./pages/BuyPage";
+import { EnterpriseHome } from "./features/enterprise/EnterpriseHome";
+import { EnterpriseInsightsPage, EnterpriseLoansPage, EnterpriseRentPage, EnterpriseSellPage } from "./features/enterprise/EnterpriseSections";
 import { useStore } from "./store/useStore";
 import { AIAgentDrawer } from "./components/command-center/AIAgentDrawer";
 import type { Role } from "./types";
@@ -51,8 +53,13 @@ export default function App() {
         <BrowserRouter>
           <AIAgentDrawer />
           <Routes>
-            <Route path="/" element={<Landing />} />
             <Route element={<AppLayout />}>
+              <Route path="/" element={<EnterpriseHome />} />
+              <Route path="/buy" element={<BuyPage />} />
+              <Route path="/rent" element={<EnterpriseRentPage />} />
+              <Route path="/sell" element={<EnterpriseSellPage />} />
+              <Route path="/home-loans" element={<EnterpriseLoansPage />} />
+              <Route path="/insights" element={<EnterpriseInsightsPage />} />
               <Route path="/app" element={<MarketplaceExperience />} />
               <Route path="/search" element={<Search />} />
               <Route path="/properties/:id" element={<PropertyDetails />} />

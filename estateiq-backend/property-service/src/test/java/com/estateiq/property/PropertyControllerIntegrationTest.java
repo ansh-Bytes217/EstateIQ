@@ -84,6 +84,23 @@ class PropertyControllerIntegrationTest {
     }
 
     @Test
+    void anonymousCanSearchActiveListings() throws Exception {
+        var property = propertyRepository.save(com.estateiq.property.entity.Property.builder()
+                .id(UUID.randomUUID()).ownerSubject("search-owner").title("Public search home")
+                .propertyType(PropertyType.APARTMENT).city("Mumbai").locality("Worli")
+                .status(com.estateiq.property.entity.PropertyStatus.DRAFT).build());
+        listingRepository.save(Listing.builder().id(UUID.randomUUID()).property(property)
+                .listingType(ListingType.SALE).status(ListingStatus.ACTIVE)
+                .price(new BigDecimal("25000000")).currency("INR").build());
+
+        mockMvc.perform(get("/api/v1/properties/search?city=Mumbai&listingType=SALE"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.items[0].title").value("Public search home"))
+                .andExpect(jsonPath("$.items[0].price").value(25000000));
+    }
+
+    @Test
     void anotherOwnerCannotReadProperty() throws Exception {
         var property = propertyRepository.save(com.estateiq.property.entity.Property.builder()
                 .id(UUID.randomUUID()).ownerSubject("owner-a").title("Private home")

@@ -69,6 +69,7 @@ All browser traffic should go through the gateway.
 
 ```text
 GET    /api/v1/properties/health
+GET    /api/v1/properties/search?city=Mumbai&listingType=SALE
 GET    /api/v1/properties
 POST   /api/v1/properties
 GET    /api/v1/properties/{id}
@@ -77,6 +78,7 @@ DELETE /api/v1/properties/{id}
 POST   /api/v1/properties/{propertyId}/listings
 GET    /api/v1/properties/listings/{listingId}
 PATCH  /api/v1/properties/listings/{listingId}/status
+PATCH  /api/v1/properties/listings/{listingId}/moderate
 ```
 
 ### User API
@@ -105,7 +107,7 @@ From this directory:
 docker compose up -d
 ```
 
-This starts PostgreSQL, Keycloak, Prometheus, and Grafana.
+This starts PostgreSQL, Keycloak, Redis, Kafka, Prometheus, and Grafana. Redis is available for opt-in cache profiles; Kafka receives listing lifecycle events when `ESTATEIQ_EVENTS_ENABLED=true`.
 
 ### Configure the services
 
@@ -122,6 +124,10 @@ CORS_ALLOWED_ORIGINS=http://localhost:3000
 AUTH_SERVICE_URL=http://localhost:8081
 PROPERTY_SERVICE_URL=http://localhost:8082
 SEARCH_SERVICE_URL=http://localhost:8083
+REDIS_HOST=localhost
+REDIS_PORT=6379
+KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+ESTATEIQ_EVENTS_ENABLED=false
 ```
 
 ### Build and test

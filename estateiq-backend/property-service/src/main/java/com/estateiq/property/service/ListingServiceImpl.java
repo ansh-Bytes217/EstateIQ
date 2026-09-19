@@ -8,9 +8,12 @@ import com.estateiq.property.dto.ListingResponse;
 import com.estateiq.property.entity.Listing;
 import com.estateiq.property.entity.ListingStatus;
 import com.estateiq.property.entity.Property;
+import com.estateiq.property.event.ListingStatusChangedEvent;
 import com.estateiq.property.repository.ListingRepository;
 import com.estateiq.property.repository.PropertyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,10 @@ public class ListingServiceImpl implements ListingService {
     private final ListingRepository listingRepository;
     private final PropertyRepository propertyRepository;
     private final CurrentUserProvider currentUserProvider;
+    private final AuditEventService auditEventService;
+    private final KafkaTemplate<String, ListingStatusChangedEvent> kafkaTemplate;
+    @Value("${estateiq.events.enabled:false}")
+    private boolean eventsEnabled;
 
     @Override
     public ListingResponse create(UUID propertyId, ListingRequest request) {
@@ -33,7 +40,10 @@ public class ListingServiceImpl implements ListingService {
                 .listingType(request.getListingType()).status(ListingStatus.DRAFT)
                 .price(request.getPrice()).currency(request.getCurrency())
                 .expiresAt(request.getExpiresAt()).build();
-        return toResponse(listingRepository.save(listing));
+        ListingResponse response = toResponse(listingRepository.save(listing));
+        auditEventService.record("LISTING_CREATED", "LISTING", response.getId(), response.getStatus().name());
+        publishEvent(listing, ListingStatus.DRAFT);
+        return response;
     }
 
     @Override
@@ -51,7 +61,17 @@ public class ListingServiceImpl implements ListingService {
         }
         listing.setStatus(targetStatus);
         listing.setListedAt(targetStatus == ListingStatus.ACTIVE ? Instant.now() : listing.getListedAt());
-        return toResponse(listingRepository.save(listing));
+        ListingResponse response = toResponse(listingRepository.save(listing));
+        auditEventService.record("LISTING_STATUS_CHANGED", "LISTING", response.getId(), current.name() + "->" + targetStatus.name());
+        publishEvent(listing, current);
+        return response;
+    }
+
+    private void publishEvent(Listing listing, ListingStatus previousStatus) {
+        if (!eventsEnabled) return;
+        kafkaTemplate.send("estateiq.listing-events", listing.getId().toString(),
+                new ListingStatusChangedEvent(listing.getId(), listing.getProperty().getId(), previousStatus,
+                        listing.getStatus(), currentUserProvider.getRequiredUserSubject(), Instant.now()));
     }
 
     private Property findProperty(UUID propertyId) {

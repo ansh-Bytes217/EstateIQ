@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "../../store/useStore";
-import { Building2, Search, Heart, User as UserIcon, LayoutDashboard, LogOut, X, Sparkles } from "lucide-react";
+import { Building2, Search, Heart, User as UserIcon, LayoutDashboard, LogOut, X, Sparkles, ChevronDown } from "lucide-react";
 import { Button } from "../ui/Button";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -14,6 +14,14 @@ export const Navbar = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
+  const [activeNav, setActiveNav] = useState<string | null>(null);
+  const navItems: Array<{ label: string; to: string; groups: Array<[string, string[]]> }> = [
+    { label: "Buy", to: "/buy", groups: [["Popular choices", ["Ready to move", "Owner properties", "Budget homes", "New projects"]], ["Property types", ["Flats", "Villas", "Plots", "Office spaces"]], ["Budget", ["Under ₹50 Lac", "₹50 Lac - ₹1 Cr", "₹1 Cr - ₹1.5 Cr", "Above ₹1.5 Cr"]], ["Explore", ["Localities", "Projects", "Find an agent", "Property guides"]]] },
+    { label: "Rent", to: "/rent", groups: [["Popular choices", ["Flats for rent", "Owner properties", "No brokerage", "PG / co-living"]], ["Property types", ["Apartments", "Independent houses", "Villas", "Commercial spaces"]], ["Rent tools", ["Rent agreement", "Tenant services", "Rental trends", "Moving checklist"]]] },
+    { label: "Sell", to: "/sell", groups: [["For owner", ["Post property", "My dashboard", "Sell / rent packages"]], ["Selling tools", ["Property valuation", "Find an agent", "Rates & trends", "PropWorth"]]] },
+    { label: "Home Loans", to: "/home-loans", groups: [["Apply now", ["Home loans", "Balance transfer", "Loan against property"]], ["Explore", ["EMI calculator", "Loan eligibility", "Credit score", "Prepayment"]], ["Partners", ["SBI home loan", "HDFC home loan", "Axis home loan", "LIC housing finance"]]] },
+    { label: "Insights", to: "/insights", groups: [["Market intelligence", ["Rates & trends", "Buy vs rent", "Locality guides", "Investment outlook"]], ["Advice", ["First-time buyer", "Home loan guides", "Interior ideas", "Legal explainers"]]] },
+  ];
 
   const submitAuth = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -37,10 +45,8 @@ export const Navbar = () => {
             <span className="text-xl font-bold tracking-tight text-slate-900">EstateIQ</span>
           </Link>
           
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <Link to="/search" className="hover:text-emerald-600 transition-colors">Buy</Link>
-            <Link to="/search?type=rent" className="hover:text-emerald-600 transition-colors">Rent</Link>
-            <Link to="/search?type=commercial" className="hover:text-emerald-600 transition-colors">Commercial</Link>
+          <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-slate-600">
+            {navItems.map((item) => <div key={item.label} className="group relative" onMouseEnter={() => setActiveNav(item.label)} onMouseLeave={() => setActiveNav(null)}><Link to={item.to} className="flex items-center gap-1 rounded-lg px-3 py-5 hover:text-emerald-600 transition-colors">{item.label}<ChevronDown className="h-3.5 w-3.5" /></Link>{activeNav === item.label && <div className="absolute left-0 top-full z-50 grid min-w-[620px] gap-6 rounded-b-xl border border-slate-200 bg-white p-6 shadow-xl" style={{ gridTemplateColumns: `repeat(${Math.min(item.groups.length, 4)}, minmax(0, 1fr))` }}>{item.groups.map(([heading, links]) => <div key={heading}><h3 className="border-b border-slate-200 pb-2 text-xs font-bold uppercase tracking-wide text-slate-900">{heading}</h3><div className="mt-3 space-y-2">{links.map((link) => <Link key={link} to={link === "Ready to move" ? "/search?filter=ready" : item.to === "/buy" ? `/search?status=For+Sale&query=${encodeURIComponent(link)}` : item.to} className="block text-sm text-slate-500 hover:text-emerald-600">{link}</Link>)}</div></div>)}</div>}</div>)}
           </nav>
         </div>
 
@@ -66,6 +72,7 @@ export const Navbar = () => {
               Search
             </Button>
           </Link>
+          <Link to="/sell" className="hidden rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700 lg:block">Post Property <span className="ml-1 rounded bg-amber-300 px-1.5 py-0.5 text-[10px] text-slate-900">FREE</span></Link>
           
           <Link to="/saved" className="relative text-slate-600 hover:text-emerald-600 transition-colors">
             <Heart className="h-5 w-5" />

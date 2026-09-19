@@ -4,7 +4,7 @@ import { ArrowRight, BarChart3, Check, CircleDollarSign, FileText, Gauge, Home, 
 import { useState } from "react";
 
 function Shell({ eyebrow, title, description, children }: { eyebrow: string; title: string; description: string; children: React.ReactNode }) {
-  return <div className="min-h-screen bg-[#f7f8f6] text-[#192c45]"><div className="border-b border-slate-200 bg-white px-5 py-4"><div className="mx-auto flex max-w-[1200px] items-center justify-between"><a href="/" className="flex items-center gap-2 font-extrabold"><span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#d9232e] text-white">E</span>EstateIQ</a><a href="/app" className="rounded-full border border-slate-200 px-4 py-2 text-sm font-bold">Search properties</a></div></div><main className="mx-auto max-w-[1200px] px-5 py-12 lg:px-10"><div className="max-w-3xl"><p className="text-sm font-bold uppercase tracking-[0.18em] text-[#d9232e]">{eyebrow}</p><h1 className="mt-4 text-5xl font-extrabold leading-tight tracking-tight">{title}</h1><p className="mt-5 text-lg leading-8 text-slate-500">{description}</p></div>{children}</main></div>;
+  return <div className="bg-[#f7f8f6] text-[#192c45]"><main className="mx-auto max-w-[1200px] px-5 py-12 lg:px-10"><div className="max-w-3xl"><p className="text-sm font-bold uppercase tracking-[0.18em] text-[#d9232e]">{eyebrow}</p><h1 className="mt-4 text-5xl font-extrabold leading-tight tracking-tight">{title}</h1><p className="mt-5 text-lg leading-8 text-slate-500">{description}</p></div>{children}</main></div>;
 }
 
 export function EnterpriseSellPage() {

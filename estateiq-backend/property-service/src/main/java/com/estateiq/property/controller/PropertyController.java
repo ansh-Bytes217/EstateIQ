@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.UUID;
 import java.util.Map;
@@ -36,6 +37,18 @@ public class PropertyController {
 
     private final PropertyService propertyService;
     private final ListingService listingService;
+
+    @Operation(summary = "Search active public listings")
+    @GetMapping("/search")
+    public PagedResponse<com.estateiq.property.dto.PublicPropertyResponse> search(
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String listingType,
+            @RequestParam(required = false) String propertyType,
+            @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @RequestParam(required = false) java.math.BigDecimal maxPrice,
+            Pageable pageable) {
+        return propertyService.searchPublic(city, listingType, propertyType, minPrice, maxPrice, pageable);
+    }
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
@@ -82,6 +95,13 @@ public class PropertyController {
     @Operation(summary = "Transition a listing lifecycle status")
     @PatchMapping("/listings/{listingId}/status")
     public ListingResponse transitionListing(@PathVariable UUID listingId, @Valid @RequestBody ListingStatusRequest request) {
+        return listingService.transition(listingId, request.getStatus());
+    }
+
+    @Operation(summary = "Moderate a listing")
+    @PatchMapping("/listings/{listingId}/moderate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ListingResponse moderateListing(@PathVariable UUID listingId, @Valid @RequestBody ListingStatusRequest request) {
         return listingService.transition(listingId, request.getStatus());
     }
 }

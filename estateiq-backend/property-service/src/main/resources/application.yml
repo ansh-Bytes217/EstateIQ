@@ -27,6 +27,21 @@ spring:
     default-schema: property
     table: flyway_schema_history
     create-schemas: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  cache:
+    type: ${SPRING_CACHE_TYPE:simple}
+
+estateiq:
+  events:
+    enabled: ${ESTATEIQ_EVENTS_ENABLED:false}
   security:
     oauth2:
       resourceserver:

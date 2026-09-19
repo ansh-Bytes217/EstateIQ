@@ -6,9 +6,15 @@ import com.estateiq.common.security.CurrentUserProvider;
 import com.estateiq.property.dto.PropertyRequest;
 import com.estateiq.property.dto.PropertyResponse;
 import com.estateiq.property.dto.PropertyUpdateRequest;
+import com.estateiq.property.dto.PublicPropertyResponse;
+import com.estateiq.property.entity.Listing;
+import com.estateiq.property.entity.ListingStatus;
+import com.estateiq.property.entity.ListingType;
+import com.estateiq.property.entity.PropertyType;
 import com.estateiq.property.entity.Property;
 import com.estateiq.property.entity.PropertyStatus;
 import com.estateiq.property.repository.PropertyRepository;
+import com.estateiq.property.repository.ListingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,7 +27,9 @@ import java.util.UUID;
 @Transactional
 public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
+    private final ListingRepository listingRepository;
     private final CurrentUserProvider currentUserProvider;
+    private final AuditEventService auditEventService;
 
     @Override
     public PropertyResponse create(PropertyRequest request) {
@@ -30,7 +38,9 @@ public class PropertyServiceImpl implements PropertyService {
         property.setOwnerSubject(currentUserProvider.getRequiredUserSubject());
         property.setStatus(PropertyStatus.DRAFT);
         apply(property, request);
-        return toResponse(propertyRepository.save(property));
+        PropertyResponse response = toResponse(propertyRepository.save(property));
+        auditEventService.record("PROPERTY_CREATED", "PROPERTY", response.getId(), response.getStatus().name());
+        return response;
     }
 
     @Override
@@ -74,6 +84,21 @@ public class PropertyServiceImpl implements PropertyService {
         propertyRepository.delete(findOwned(id));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponse<PublicPropertyResponse> searchPublic(String city, String listingType, String propertyType,
+                                                               java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice,
+                                                               Pageable pageable) {
+        ListingType requestedListingType = parseEnum(listingType, ListingType.class);
+        PropertyType requestedPropertyType = parseEnum(propertyType, PropertyType.class);
+        var page = propertyRepository.searchPublic(ListingStatus.ACTIVE, requestedListingType, requestedPropertyType,
+                blankToNull(city), minPrice, maxPrice, pageable);
+        return PagedResponse.from(page.map(property -> listingRepository
+                .findFirstByPropertyIdAndStatusOrderByCreatedAtDesc(property.getId(), ListingStatus.ACTIVE)
+                .map(listing -> toPublicResponse(property, listing))
+                .orElseThrow()));
+    }
+
     private Property findOwned(UUID id) {
         if (currentUserProvider.isAdmin()) {
             return propertyRepository.findById(id)
@@ -109,5 +134,25 @@ public class PropertyServiceImpl implements PropertyService {
                 .yearBuilt(property.getYearBuilt()).floor(property.getFloor()).parking(property.isParking())
                 .furnished(property.isFurnished()).latitude(property.getLatitude()).longitude(property.getLongitude())
                 .createdAt(property.getCreatedAt()).updatedAt(property.getUpdatedAt()).build();
+    }
+
+    private PublicPropertyResponse toPublicResponse(Property property, Listing listing) {
+        return PublicPropertyResponse.builder().id(property.getId()).title(property.getTitle())
+                .description(property.getDescription()).propertyType(property.getPropertyType())
+                .listingType(listing.getListingType()).listingStatus(listing.getStatus()).price(listing.getPrice())
+                .currency(listing.getCurrency()).bedrooms(property.getBedrooms()).bathrooms(property.getBathrooms())
+                .areaSqft(property.getAreaSqft()).city(property.getCity()).locality(property.getLocality())
+                .yearBuilt(property.getYearBuilt()).floor(property.getFloor()).parking(property.isParking())
+                .furnished(property.isFurnished()).latitude(property.getLatitude()).longitude(property.getLongitude())
+                .listedAt(listing.getListedAt()).build();
+    }
+
+    private String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value;
+    }
+
+    private <T extends Enum<T>> T parseEnum(String value, Class<T> enumType) {
+        if (value == null || value.isBlank()) return null;
+        return Enum.valueOf(enumType, value.trim().toUpperCase().replace('-', '_').replace(' ', '_'));
     }
 }
